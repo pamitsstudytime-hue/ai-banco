@@ -1,0 +1,130 @@
+export interface Category {
+  name: string;
+  color: string;
+  icon?: string;
+}
+
+export interface Wallet {
+  id: string;
+  name: string;
+  openingBalance: number;
+  color: string;
+}
+
+export interface Friend {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  notes: string;
+  color: string;
+  createdAt: number;
+}
+
+export type ExpenseFlow = 'in' | 'out';
+export type ExpenseType = 'personal' | 'for_friend' | 'by_friend';
+export type ExpenseStatus = 'paid' | 'unpaid' | 'unsettled';
+
+export interface Expense {
+  id: string;
+  groupId?: string | null;
+  description: string;
+  amount: number;
+  category: string;
+  date: string;
+  type: ExpenseType;
+  flow: ExpenseFlow;
+  friendId: string | null;
+  walletId: string;
+  status: ExpenseStatus;
+  settled: boolean;
+  settlementId: string | null;
+  notes: string;
+  createdAt: number;
+}
+
+export interface Settlement {
+  id: string;
+  friendId: string;
+  amount: number;
+  date: string;
+  note: string;
+  expenseIds: string[];
+  createdAt: number;
+  walletId?: string;
+  paymentMethod?: string;
+}
+
+export interface Settings {
+  currency: string;
+  categories: Category[];
+  defaultCategory: string;
+  defaultStatus: ExpenseStatus;
+  defaultWalletId: string;
+}
+
+export type RecurringKind = 'autopay' | 'quick_log';
+export type FrequencyType = 'daily' | 'weekly' | 'monthly' | 'custom_days' | 'custom_months';
+
+export interface RecurringRule {
+  id: string;
+  title: string;
+  kind: RecurringKind; // 'autopay' for subscriptions / fixed bills, 'quick_log' for daily / frequent items
+  amount: number;
+  category: string;
+  walletId: string;
+  type: ExpenseType; // 'personal' | 'for_friend' | 'by_friend'
+  flow: ExpenseFlow; // 'out' | 'in'
+  friendId?: string | null;
+  frequency: FrequencyType;
+  intervalValue?: number; // e.g. 2 for "every 2 months", 3 for "every 3 days"
+  
+  startDate: string; // ISO date YYYY-MM-DD
+  nextDueDate?: string; // ISO date YYYY-MM-DD (for autopay)
+  autoDeduct?: boolean;
+  lastDeductedDate?: string | null;
+  
+  lastLoggedDate?: string | null; // for quick log items
+  status: 'active' | 'paused';
+  notes?: string;
+  createdAt: number;
+}
+
+export interface AppDB {
+  version: number;
+  friends: Friend[];
+  expenses: Expense[];
+  settlements: Settlement[];
+  wallets: Wallet[];
+  settings: Settings;
+  recurringRules?: RecurringRule[];
+}
+
+export interface FriendBalance {
+  friend: Friend;
+  owedToMe: number;
+  owedByMe: number;
+  net: number;
+}
+
+export type ViewName =
+  | 'dashboard'
+  | 'expenses'
+  | 'wallets'
+  | 'friends'
+  | 'friend-detail'
+  | 'settlements'
+  | 'analytics'
+  | 'settings'
+  | 'recurring';
+
+export interface ExpenseFilters {
+  search: string;
+  category: string;
+  friend: string;
+  status: string;
+  type: string;
+  flow: string;
+  wallet: string;
+  sort: string;
+}
